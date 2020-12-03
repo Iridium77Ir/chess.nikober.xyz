@@ -1,11 +1,6 @@
 const mongoose = require('mongoose')
 
 const chessSchema = new mongoose.Schema({
-    players: {
-        type: Number,
-        required: true,
-        default: 0
-    },
     fen: {
         type: String,
         required: true,
@@ -21,6 +16,16 @@ const chessSchema = new mongoose.Schema({
         required: true,
         default: Date.now(),
         expires: 1800
+    },
+    blackAssigned: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    WhiteAssigned: {
+        type: Boolean,
+        required: true,
+        default: false,
     }
 })
 

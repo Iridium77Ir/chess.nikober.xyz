@@ -7,6 +7,11 @@ var Chess = require('../models/chess');
 router.post('/newGame', async (req, res) => {
     try {
         var newGame = new Chess({});
+        if(req.body.color == 'b') {
+            newGame.blackAssigned = true;
+        } else {
+            newGame.whiteAssigned = true;
+        }
         var game = await newGame.save();
         res.status(200).json({game: game});
     } catch (err) {
