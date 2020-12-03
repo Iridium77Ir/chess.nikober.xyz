@@ -7,7 +7,7 @@ var app = express();
 const bodyParser = require('body-parser');
 
 //Setting the view engine, etc...
-app.use(bodyParser.urlencoded({ limit: '15mb', extended: false }));
+app.use(bodyParser.json());
 
 //Connecting to mongoose
 const mongoose = require('mongoose');
