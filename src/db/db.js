@@ -4,10 +4,9 @@ require('dotenv').config();
 //Import core, crucial modules
 const express = require('express');
 var app = express();
-const bodyParser = require('body-parser');
 
 //Setting the view engine, etc...
-app.use(bodyParser.json());
+app.use(express.json());
 
 //Connecting to mongoose
 const mongoose = require('mongoose');
