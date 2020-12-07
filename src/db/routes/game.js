@@ -63,7 +63,7 @@ router.delete('/deleteGame', async (req, res) => {
     };
 });
 //
-router.update('/takebackGame', async (req, res) => {
+router.put('/takebackGame', async (req, res) => {
     try {
         var game = await Chess.findById(req.body.gameid);
         if(game != '' && game != null) {
