@@ -45,10 +45,10 @@ app.get('/', async (req, res) => {
 //
 app.post('/createGame', async (req, res) => {
     try {
-        var res = await db_fetch.createGame({color: 'w'});
+        var response = await db_fetch.createGame({color: 'w'});
         var playerData = {
             color: 'w',
-            gameid: res._id
+            gameid: response._id
         };
         token.setToken(res, playerData, process.env.JWT_SECRET);
         res.status(200).json({token: playerData});
