@@ -38,7 +38,7 @@ app.get('/', async (req, res) => {
             };
         };
     } catch (err) {
-        res.status(501).render('err', {error: err});
+        res.status(501).render('error', {error: err});
     };
 });
 
