@@ -10,7 +10,7 @@ router.get('/:gameid', async (req, res) => {
         if(checkAuthToken.result == true) {
             res.render('play', {gameid: checkAuthToken.data.gameid});
         } else if(checkAuthToken.result == false) {
-            res.render('index');
+            res.redirect('/');
         } else {
             if(checkAuthToken.err == 'nocookies') {
                 var resGame = await db_fetch.getGame(req.params.gameid);
