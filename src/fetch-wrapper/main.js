@@ -14,7 +14,7 @@ async function createGame(data) {
 
 async function getGame(id) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/getGame', { method: 'GET', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
+        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/getGame', { method: 'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
         res = res.json();
         if(res.error == undefined) {
             return {game: res.game};

@@ -19,7 +19,7 @@ router.post('/newGame', async (req, res) => {
     };
 });
 //
-router.get('/getGame', async (req, res) => {
+router.post('/getGame', async (req, res) => {
     try {
         var game = await Chess.findById(req.body.gameid);
         if(game != '' && game != null) {
