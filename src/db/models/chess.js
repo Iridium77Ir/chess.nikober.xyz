@@ -22,7 +22,7 @@ const chessSchema = new mongoose.Schema({
         required: true,
         default: false,
     },
-    WhiteAssigned: {
+    whiteAssigned: {
         type: Boolean,
         required: true,
         default: false,
