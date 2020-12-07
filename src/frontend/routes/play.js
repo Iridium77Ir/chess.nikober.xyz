@@ -24,7 +24,7 @@ router.get('/:gameid', async (req, res) => {
                     res.render('error', {error: "This game is already full or doesn't exist!"})
                 };
             } else {
-                res.render('error', {error: err});
+                res.render('error', {error: 'There was an error'});
             };
         }
     } catch (err) {
