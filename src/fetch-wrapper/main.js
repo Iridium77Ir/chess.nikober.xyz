@@ -1,9 +1,11 @@
 //Load .env file
 require('dotenv').config();
 
+const fetch = require('node-fetch');
+
 async function createGame(data) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/newGame', { method: 'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/newGame', { method: 'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify(data)});
         return res.json();
     } catch (err) {
         return {err: err};
@@ -12,7 +14,7 @@ async function createGame(data) {
 
 async function getGame(id) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/getGame', { method: 'GET', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
+        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/getGame', { method: 'GET', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
         res = res.json();
         if(res.error == undefined) {
             return {game: res.game};
@@ -26,7 +28,7 @@ async function getGame(id) {
 
 async function updateGame(id, fen) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/updateGame', { method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id, fen: fen})});
+        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/updateGame', { method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id, fen: fen})});
         res = res.json();
         if(res.error == undefined) {
             return {message: res.message};
@@ -40,7 +42,7 @@ async function updateGame(id, fen) {
 
 async function deleteGame(id) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/deleteGame', { method: 'DELETE', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
+        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/deleteGame', { method: 'DELETE', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
         res = res.json();
         if(res.error == undefined) {
             return {message: res.message};
@@ -54,7 +56,7 @@ async function deleteGame(id) {
 
 async function takebackGame(id) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/takebackGame', { method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
+        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/takebackGame', { method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
         res = res.json();
         if(res.error == undefined) {
             return {game: res.game};
