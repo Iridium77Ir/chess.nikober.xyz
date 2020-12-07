@@ -51,9 +51,9 @@ app.post('/createGame', async (req, res) => {
             gameid: response._id
         };
         token.setToken(res, playerData, process.env.JWT_SECRET);
-        res.status(200).json({token: playerData});
+        res.status(200).redirect(`/play/${response._id}`);
     } catch (err) {
-        res.status(501).json({error: err});
+        res.status(501).render('error', {error: err});
     };
 });
 
