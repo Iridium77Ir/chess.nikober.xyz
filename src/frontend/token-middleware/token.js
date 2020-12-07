@@ -6,7 +6,7 @@ function getToken(req, jwtSecret) {
             jwt.verify(req.cookies['chess-token'], jwtSecret, (err, data) => {
                 if (err) return {err: 'modified'};
                 var cookieData = JSON.parse(data);
-                return {gameid: cookieData.id, color: cookieData.color, fen: cookieData.fen};
+                return {gameid: cookieData.id, color: cookieData.color};
             });
         } else {
             return {err: 'nocookies'};

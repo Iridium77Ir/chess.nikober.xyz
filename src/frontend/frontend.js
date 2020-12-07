@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.set('layout', 'layouts/layout');
 app.use(expressLayouts);
-app.use(express.static('src/public'));
+app.use(express.static('/public'));
 
 //
 app.get('/', async (req, res) => {
@@ -48,7 +48,6 @@ app.post('/createGame', async (req, res) => {
     try {
         var res = await db_fetch.createGame({color: 'w'});
         var playerData = {
-            fen: res.fen,
             color: 'w',
             gameid: res._id
         };

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const token = require('../token-middleware/token.js');
+const db_fetch = require('../../fetch-wrapper/main.js');
 
 router.get('/:gameid', async (req, res) => {
     try {
@@ -12,7 +13,16 @@ router.get('/:gameid', async (req, res) => {
             res.render('index');
         } else {
             if(checkAuthToken.err == 'nocookies') {
-                res.render('index');
+                var resGame = await db_fetch.getGame(req.params.gameid);
+                if(resGame.whiteAssigned == false) {
+                    token.setToken(res, {color: 'w', gameid: req.params.id}, process.env.JWT_SECRET);
+                    res.render('play', {gameid: req.params.gameid});
+                } else if(resGame.blackAssigned == false) {
+                    token.setToken(res, {color: 'b', gameid: req.params.id}, process.env.JWT_SECRET);
+                    res.render('play', {gameid: req.params.gameid});
+                } else {
+                    res.render('error', {error: "This game is already full or doesn't exist!"})
+                };
             } else {
                 res.render('error', {error: err});
             };
