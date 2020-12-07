@@ -66,4 +66,4 @@ async function takebackGame(id) {
     };
 };
 
-module.exports = createGame, getGame, updateGame, deleteGame, takebackGame;
+module.exports = {createGame: createGame, getGame: getGame, updateGame: updateGame, deleteGame: deleteGame, takebackGame: takebackGame};

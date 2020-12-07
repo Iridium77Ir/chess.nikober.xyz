@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const token = require('../token-middleware/token.js');
-const db_fetch = require('../../fetch-wrapper/main.js');
+const token = require('../token-middleware/token');
+const db_fetch = require('../../fetch-wrapper/main');
 
 router.get('/:gameid', async (req, res) => {
     try {

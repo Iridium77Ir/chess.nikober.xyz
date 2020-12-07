@@ -10,8 +10,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 const jwt = require('jsonwebtoken');
-const db_fetch = require('../fetch-wrapper/main.js');
-const token = require('./token-middleware/token.js');
+const db_fetch = require('../fetch-wrapper/main');
+const token = require('./token-middleware/token');
 
 const expressLayouts = require('express-ejs-layouts');
 //Setting the view engine, etc...
@@ -19,13 +19,13 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.set('layout', 'layouts/layout');
 app.use(expressLayouts);
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 //
 app.get('/', async (req, res) => {
     try {
         var returnToken = token.getToken(req, process.env.JWT_SECRET);
-        if(returnToken.err != undefined) {
+        if(!returnToken.hasOwnProperty('err')) {
             res.redirect(`/play/${returnToken.id}`);
         } else {
             if(returnToken.err == 'modified') {

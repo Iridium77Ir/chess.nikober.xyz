@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 function getToken(req, jwtSecret) {
     try {
-        if(req.cookies != null) {
+        if(req.cookies['chess-token'] != null && req.cookies['chess-token'] != '') {
             jwt.verify(req.cookies['chess-token'], jwtSecret, (err, data) => {
                 if (err) return {err: 'modified'};
                 var cookieData = JSON.parse(data);
@@ -42,4 +42,4 @@ function checkAuth(req, id, jwtSecret) {
     };
 };
 
-module.exports = getToken, setToken, checkAuth;
+module.exports = {getToken: getToken, setToken: setToken, checkAuth: checkAuth};
