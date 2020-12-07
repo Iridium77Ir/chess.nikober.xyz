@@ -1,13 +1,12 @@
 //Load .env file
 require('dotenv').config();
 
+//Import core, crucial modules
 const express = require('express');
 var app = express();
-
 const cookieParser = require('cookie-parser');
 app.use(cookieParser);
 
-//Setting the view engine, etc...
 app.use(express.json());
 
 const jwt = require('jsonwebtoken');
@@ -20,7 +19,7 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.set('layout', 'layouts/layout');
 app.use(expressLayouts);
-app.use(express.static('/public'));
+app.use(express.static('public'));
 
 //
 app.get('/', async (req, res) => {
