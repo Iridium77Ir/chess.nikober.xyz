@@ -5,7 +5,7 @@ function getToken(req, jwtSecret) {
         if(req.cookies['chess-token'] != null && req.cookies['chess-token'] != '') {
             jwt.verify(JSON.parse(req.cookies['chess-token']), jwtSecret, (err, data) => {
                 if (err) return {err: 'modified'};
-                var cookieData = JSON.parse(data);
+                var cookieData = data;
                 return {gameid: cookieData.id, color: cookieData.color};
             });
         } else {
