@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 function getToken(req, jwtSecret) {
     try {
         if(req.cookies['chess-token'] != null && req.cookies['chess-token'] != '') {
-            jwt.verify(req.cookies['chess-token'], jwtSecret, (err, data) => {
+            jwt.verify(JSON.parse(req.cookies['chess-token']), jwtSecret, (err, data) => {
                 if (err) return {err: 'modified'};
                 var cookieData = JSON.parse(data);
                 return {gameid: cookieData.id, color: cookieData.color};
