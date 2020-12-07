@@ -48,10 +48,10 @@ app.post('/createGame', async (req, res) => {
         var response = await db_fetch.createGame({color: 'w'});
         var playerData = {
             color: 'w',
-            gameid: response._id
+            gameid: response.game._id
         };
         token.setToken(res, playerData, process.env.JWT_SECRET);
-        res.status(200).redirect(`/play/${response._id}`);
+        res.status(200).redirect(`/play/${response.game._id}`);
     } catch (err) {
         res.status(501).render('error', {error: err});
     };
