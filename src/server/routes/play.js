@@ -13,7 +13,7 @@ router.get('/:gameid', async (req, res) => {
             res.redirect('/');
         } else {
             if(checkAuthToken.err == 'nocookies') {
-                var resGame = await db_fetch.getGame(req.params.gameid);
+                var resGame = await db_fetch.getGame(req.params.gameid).game;
                 if(resGame.whiteAssigned == false) {
                     token.setToken(res, {color: 'w', gameid: req.params.id}, process.env.JWT_SECRET);
                     res.render('play', {gameid: req.params.gameid});
