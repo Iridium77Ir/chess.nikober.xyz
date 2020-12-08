@@ -33,7 +33,7 @@ app.get('/', async (req, res) => {
     try {
         var returnToken = token.getToken(req, process.env.JWT_SECRET);
         if(!returnToken.hasOwnProperty('err')) {
-            res.redirect(`/play/${returnToken.id}`);
+            res.redirect(`/play/${returnToken.gameid}`);
         } else {
             if(returnToken.err == 'modified') {
                 res.clearCookie('chess-token');
