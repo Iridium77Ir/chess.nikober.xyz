@@ -12,6 +12,7 @@ let color = token.color;
 var play = true;
 let roomId;
 var promotionPiece = 'q';
+var hasPressed = false;
 
 //Functions
 //Leave match
@@ -34,8 +35,11 @@ var removeGreySquares = function () {
 };
 //Takeback
 function offerTakeback() {
-    setButton(true);
-    socket.emit('offerTakeback', {token: token, id: roomId});
+    if(!hasPressed) {
+        setButton(true);
+        socket.emit('offerTakeback', {token: token, id: roomId});
+        hasPressed = true;
+    };
 }
 
 //Socket Handlers:
@@ -88,13 +92,14 @@ socket.on('play', function (data) {
 socket.on('move', function (data) {
     game.move(data.move)
     board.position(data.fen);
-    if(game.turn() == 'b' && color == 'white') {
+    if(game.turn() == color) {
         setButton(false);
-    } else if(game.turn() == 'w' && color == 'black') {
+    } else if(game.turn() == color) {
         setButton(false);
     } else {
         setButton(true);
-    }
+    };
+    hasPressed = false;
 });
 //redirect
 socket.on('redirect', (data) => {
