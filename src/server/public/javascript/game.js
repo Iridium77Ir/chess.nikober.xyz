@@ -1,26 +1,26 @@
 //Connect to socket:
 var socket = io('wss://' + window.location.hostname + ':443');
 
+//Get jwt
+var token = parseJwt(getCookie('chess-token'));
+var rawToken = getCookie('chess-token');
+
 //Initing the chess.js board
 var game = new Chess();
 
 //Initialising vars
-let color;
-var players;
+let color = token.color;
 var play = true;
 let roomId;
 var promotionPiece = 'q';
+var hasPressed = false;
 
 //Functions
 //Leave match
 function leaveMatch() {
-    socket.emit('gameOver', roomId);
-    eraseCookies();
-}
-function eraseCookies() {
-    setCookie('game', '');
-    setCookie('color', '');
-}
+    socket.emit('gameOver', {token: rawToken, id: roomId});
+    eraseCookie('chess-token');
+};
 //Create the grey squares that appear when hovering over tiles
 var greySquare = function (square) {
     var squareEl = $('#board .square-' + square);
@@ -36,44 +36,39 @@ var removeGreySquares = function () {
 };
 //Takeback
 function offerTakeback() {
-    setButton(true);
-    socket.emit('offerTakeback', {id: roomId});
+    if(!hasPressed) {
+        setButton(true);
+        socket.emit('offerTakeback', {token: rawToken, id: roomId});
+        hasPressed = true;
+        setButton(true);
+    };
 }
 
 //Socket Handlers:
-//Getting own color, or loading from localstorage, depending if game was already running
-socket.on('color', (msg) => {
-    if(msg.color != 'null') {
-        setCookie('color', msg.color, 0.5);
-        color = msg.color;
-    } else {
-        color = getCookie('color');
-    }
-})
 //Handling errors
-socket.on('errorMessage', (msg) => {
-    alert('Err: ' + msg);
-    eraseCookies();
+socket.on('errorMessage', (data) => {
+    alert('Err: ' + data.error);
+    eraseCookie('chess-token');
 })
 //What happens when an opponent leaves
-socket.on('opponentLeave', (msg) => {
+socket.on('opponentLeave', (data) => {
     alert('Your opponent left the game.');
-    eraseCookies();
-    window.location.replace(msg);
+    eraseCookie('chess-token');
+    window.location.replace(data);
 })
 //What happens if  a takeback is offered
-socket.on('takebackOffered', (msg) => {
+socket.on('takebackOffered', (data) => {
     alert('Your opponent offered a takeback!');
     var acceptButton = document.createElement('button');
     acceptButton.onclick = function() {
-        socket.emit('takebackAccept', {id: roomId})
+        socket.emit('takebackAccept', {token: rawToken, id: roomId})
         declineButton.remove();
         acceptButton.remove();
     };
     acceptButton.innerText = 'Accept Takeback.'
     var declineButton = document.createElement('button');
     declineButton.onclick = function() {
-        socket.emit('takebackReject', {id: roomId});
+        socket.emit('takebackReject', {token: rawToken, id: roomId});
         declineButton.remove();
         acceptButton.remove();
     };
@@ -82,43 +77,48 @@ socket.on('takebackOffered', (msg) => {
     top.appendChild(acceptButton);
     top.appendChild(declineButton);
 })
-socket.on('takebackResetBoard', async (msg) => {
+socket.on('takebackResetBoard', async (data) => {
     //setButton
-    board.position(msg);
-    game = new Chess(msg);
+    board.position(data);
+    game = new Chess(data);
 })
-socket.on('noTakeback', async (msg) => {
-    //setButton
+socket.on('noTakeback', async (data) => {
+    alert('Your opponent declined a takeback');
+})
+//Takeback not allowed
+socket.on('takebackNotAllowed', async (data) => {
+    alert('You currently cannot takeback');
+    setButton(true);
+    hasPressed = true;
 })
 //Changing the status indicator in the HTML
-socket.on('play', function (msg) {
+socket.on('play', function (data) {
     play = false;
     document.getElementById('gameStatus').innerText = "Game in progress";
 });
-//When game starts, set board to position sent by the server
-socket.on('starting', (msg) => {
-    board.position(msg);
-})
 //When the other player moves, set the board in the position
-socket.on('move', function (msg) {
-    game.move(msg.move)
-    board.position(msg.board);
-    if(game.turn() == 'b' && color == 'white') {
+socket.on('move', function (data) {
+    game.move(data.move)
+    board.position(data.fen);
+    if(game.turn() == 'b' && color == 'w') {
         setButton(false);
-    } else if(game.turn() == 'w' && color == 'black') {
+    } else if(game.turn() == 'w' && color == 'b') {
         setButton(false);
     } else {
         setButton(true);
-    }
+    };
+    hasPressed = false;
+});
+socket.on('illegalMove', function (data) {
+    board.position(data.fen);
 });
 //redirect
-socket.on('redirect', (msg) => {
-    window.location.replace(msg);
+socket.on('redirect', (data) => {
+    window.location.replace(data);
 })
 //Send the joined confirmation to receive information about onself
 roomId = document.getElementById('roomId').innerText;
-setCookie('game', roomId, 0.5);
-socket.emit('joined', roomId);
+socket.emit('joined', {token: rawToken, id: roomId});
 
 function setButton(state) {
     document.getElementById('takebackButton').disabled = state;
@@ -131,8 +131,8 @@ var onDragStart = function (source, piece) {
     if (game.game_over() === true || play ||
         (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
         (game.turn() === 'b' && piece.search(/^w/) !== -1) ||
-        (game.turn() === 'w' && color === 'black') ||
-        (game.turn() === 'b' && color === 'white') ) {
+        (game.turn() === 'w' && color === 'b') ||
+        (game.turn() === 'b' && color === 'w') ) {
             return false;
     }
 };
@@ -159,11 +159,11 @@ var onDrop = function (source, target) {
     // illegal move
     if (move === null) return 'snapback';
     else
-        socket.emit('move', { move: move, board: game.fen(), room: roomId });
+        socket.emit('move', {token: rawToken, move: move, fen: game.fen(), id: roomId });
      
-    if(game.turn() == 'b' && color == 'white') {
+    if(game.turn() == 'b' && color == 'w' && !hasPressed) {
         setButton(false);
-    } else if(game.turn() == 'w' && color == 'black') {
+    } else if(game.turn() == 'w' && color == 'b' && !hasPressed) {
         setButton(false);
     } else {
         setButton(true);
@@ -193,30 +193,26 @@ var onSnapEnd = function () {
 };
 
 //initialising the board:
-socket.on('player', (msg) => {
-    players = msg.players;
-    if(players >= 2){
-        play = false;
-        socket.emit('play', msg.roomId);
-        document.getElementById('gameStatus').innerText = "Game in Progress";
-        setButton(false);
-    }
-    else
-        document.getElementById('gameStatus').innerText = "Waiting for Second player";
-        var cfg = {
-            orientation: color,
-            draggable: true,
-            position: 'start',
-            onDragStart: onDragStart,
-            onDrop: onDrop,
-            onMouseoutSquare: onMouseoutSquare,
-            onMouseoverSquare: onMouseoverSquare,
-            onSnapEnd: onSnapEnd,
-            pieceTheme: 'https://koblenski.github.io/javascript/chessboardjs-0.3.0/img/chesspieces/wikipedia/{piece}.png'
-        };
-        board = ChessBoard('board', cfg);
-        board.position(msg.board);
-        game = new Chess(msg.board);
+socket.on('fen', (data) => {
+    play = false;
+    socket.emit('play', {token: rawToken, id: roomId});
+    setButton(false);
+    document.getElementById('gameStatus').innerText = "Waiting for Second player";
+    var cfg = {
+        orientation: ((color == 'w') ? ('white') : ('black')),
+        draggable: true,
+        position: 'start',
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+        onMouseoutSquare: onMouseoutSquare,
+        onMouseoverSquare: onMouseoverSquare,
+        onSnapEnd: onSnapEnd,
+        pieceTheme: 'https://koblenski.github.io/javascript/chessboardjs-0.3.0/img/chesspieces/wikipedia/{piece}.png'
+    };
+    board = ChessBoard('board', cfg);
+    board.position(data.fen);
+    game = new Chess(data.fen);
+    setButton(true);
 });
 
 //Board variable
