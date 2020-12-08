@@ -39,6 +39,7 @@ function offerTakeback() {
         setButton(true);
         socket.emit('offerTakeback', {token: token, id: roomId});
         hasPressed = true;
+        setButton(true);
     };
 }
 
