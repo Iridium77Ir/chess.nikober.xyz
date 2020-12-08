@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" class="full-height">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Play chess with your friends by sharing a link." />
+    <title>Multiplayer chess : play with your friends</title>
+    <link rel="stylesheet" href="/stylesheet/main.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="/javascript/JWTDecoder.js"></script>
+    <script src="/javascript/cookieHandler.js"></script>
+    <script src="/javascript/reconnect.js"></script>
+    <script>
+        function enterGamewithCode() {
+            var id = document.getElementById("gameidInput").value;
+            window.location.replace('/play/' + id);
+        }
+    </script>
+</head>
+    <body>
+        <style>
+            body {
+                font-family: "Lato", sans-serif}
+                .mySlides {display: none
+            }
+        </style>
+        <%- include('../partials/header') %>
+
+        <%- body %>
+
+        <%- include('../partials/rules') %>
+
+        <a href="https://lichess.org/"></a>
+        <%- include('../partials/footer') %>
+    </body>
+</html>
