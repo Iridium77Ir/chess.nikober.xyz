@@ -44,6 +44,9 @@ const io = require('socket.io')(process.env.WEBSOCKET_PORT);
 //require Chess to create Anticheat
 const chess = require('chess.js');
 
+//Parse cookies
+const cookie = require('cookies');
+
 //function to send the Error to both players
 function sendError(socket, err) {
     socket.emit('errorMessage', {error: err});
@@ -64,7 +67,7 @@ io.on('connection', function (socket) {
     //What happens when a players joins
     socket.on('joined', async function (data) {
         try {
-            var authData = authenticate(data.token, data.id);
+            var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
@@ -81,7 +84,7 @@ io.on('connection', function (socket) {
     //What happens when a player moves a piece
     socket.on('move', async function (data) {
         try {
-            var authData = authenticate(data.token, data.id);
+            var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
@@ -105,7 +108,7 @@ io.on('connection', function (socket) {
     //Sending the message that the game begins | TODO: Maybe add move verification server side.
     socket.on('play', function (data) {
         try {
-            var authData = authenticate(data.token, data.id);
+            var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {           
@@ -118,7 +121,7 @@ io.on('connection', function (socket) {
     //Game over notice is sent to both players, the game is deleted
     socket.on('gameOver', async (data) => {
         try {
-            var authData = authenticate(data.token, data.id);
+            var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
@@ -137,7 +140,7 @@ io.on('connection', function (socket) {
     //A player offered takeback
     socket.on('offerTakeback', async (data) => {
         try {
-            var authData = authenticate(data.token, data.id);
+            var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
@@ -155,7 +158,7 @@ io.on('connection', function (socket) {
     //The other player accepted the takeback
     socket.on('takebackAccept', async (data) => {
         try {
-            var authData = authenticate(data.token, data.id);
+            var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
@@ -174,7 +177,7 @@ io.on('connection', function (socket) {
     //The other player accepted the takeback
     socket.on('takebackReject', async (data) => {
         try {
-            var authData = authenticate(data.token, data.id);
+            var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
