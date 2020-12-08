@@ -2,7 +2,7 @@
 require('dotenv').config();
 
 //Get DB
-var Chess = require('../frontend/models/chess');
+var Chess = require('../server/models/chess');
 
 async function createGame(data) {
     try {
