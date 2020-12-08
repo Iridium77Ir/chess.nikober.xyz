@@ -82,7 +82,13 @@ socket.on('takebackResetBoard', async (data) => {
     game = new Chess(data);
 })
 socket.on('noTakeback', async (data) => {
-    //setButton
+    alert('Your opponent declined a takeback');
+})
+//Takeback not allowed
+socket.on('takebackNotAllowed', async (data) => {
+    alert('You currently cannot takeback');
+    setButton(true);
+    hasPressed = true;
 })
 //Changing the status indicator in the HTML
 socket.on('play', function (data) {

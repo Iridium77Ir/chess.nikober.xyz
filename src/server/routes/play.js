@@ -41,6 +41,9 @@ router.get('/:gameid', async (req, res) => {
 //Import socket.io and create a server at the port specified in the .env file
 const io = require('socket.io')(process.env.WEBSOCKET_PORT);
 
+//require Chess to create Anticheat
+const chess = require('chess.js');
+
 //function to send the Error to both players
 function sendError(socket, err) {
     socket.emit('errorMessage', {error: err});
@@ -49,9 +52,9 @@ function sendError(socket, err) {
 
 function authenticate(token, id) {
     jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
-        if (err) return false;
-        if (data.id != id) return false;
-        return true;
+        if (err) return {result: false};
+        if (data.id != id) return {result: false};
+        return {result: true, data: data};
     });
 }
 
@@ -59,7 +62,8 @@ io.on('connection', function (socket) {
     //What happens when a players joins
     socket.on('joined', async function (data) {
         try {
-            if(authenticate(data.token, data.id) == false) {
+            var authData = authenticate(data.token, data.id);
+            if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 var game = await db_fetch.getGame(data.id);
@@ -75,13 +79,22 @@ io.on('connection', function (socket) {
     //What happens when a player moves a piece
     socket.on('move', async function (data) {
         try {
-            if(authenticate(data.token, data.id) == false) {
+            var authData = authenticate(data.token, data.id);
+            if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
-                var game = await db_fetch.updateGame(data.id, data.fen);
-                if(!game.hasOwnProperty('err')) {
-                    socket.broadcast.emit('move', data);
+                var game = await db_fetch.getGame(data.id);
+                if((authData.data.color == 'w' && new chess.Chess(data.fen).turn() == 'b') || (authData.data.color == 'b' && new chess.Chess(data.fen).turn() == 'w')) {
+                    if(new chess.Chess(game.game.previousfen).move(data.move) !== null) {
+                        var game = await db_fetch.updateGame(data.id, data.fen);
+                        if(!game.hasOwnProperty('err')) {
+                            socket.broadcast.emit('move', data);
+                        };
+                    } else {
+                        sendError('Invalid Move.');
+                    };
                 };
+                sendError('Wrong player.');
             };
         } catch (err) {
             sendError(socket, err);
@@ -90,7 +103,8 @@ io.on('connection', function (socket) {
     //Sending the message that the game begins | TODO: Maybe add move verification server side.
     socket.on('play', function (data) {
         try {
-            if(authenticate(data.token, data.id) == false) {
+            var authData = authenticate(data.token, data.id);
+            if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {           
                 socket.broadcast.emit('play', data);
@@ -102,7 +116,8 @@ io.on('connection', function (socket) {
     //Game over notice is sent to both players, the game is deleted
     socket.on('gameOver', async (data) => {
         try {
-            if(authenticate(data.token, data.id) == false) {
+            var authData = authenticate(data.token, data.id);
+            if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 var game = await db_fetch.deleteGame(data.id);
@@ -120,10 +135,16 @@ io.on('connection', function (socket) {
     //A player offered takeback
     socket.on('offerTakeback', async (data) => {
         try {
-            if(authenticate(data.token, data.id) == false) {
+            var authData = authenticate(data.token, data.id);
+            if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
-                socket.broadcast.emit('takebackOffered', data);
+                var game = await db_fetch.takebackGame(data.id);
+                if(new chess.Chess(game.game.fen).turn() == authData.data.color) {
+                    socket.broadcast.emit('takebackOffered', data);
+                } else {
+                    socket.emit('takebackNotAllowed', 'notallowed');
+                };
             };
         } catch (err) {
             sendError(socket, err);
@@ -132,7 +153,8 @@ io.on('connection', function (socket) {
     //The other player accepted the takeback
     socket.on('takebackAccept', async (data) => {
         try {
-            if(authenticate(data.token, data.id) == false) {
+            var authData = authenticate(data.token, data.id);
+            if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 var game = await db_fetch.takebackGame(data.id);
@@ -150,7 +172,8 @@ io.on('connection', function (socket) {
     //The other player accepted the takeback
     socket.on('takebackReject', async (data) => {
         try {
-            if(authenticate(data.token, data.id) == false) {
+            var authData = authenticate(data.token, data.id);
+            if(authData.result == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 socket.emit('noTakeback');
