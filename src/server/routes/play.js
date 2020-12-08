@@ -54,10 +54,10 @@ function sendError(socket, err) {
 }
 
 function authenticate(token, id) {
-    token = token['chess-token'].replace('"', '');
+    token = token['chess-token'].replace('"', '').replace('"', '');
     var res = jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
         if (err) return {result: false};
-        if (data.id != id) return {result: false};
+        if (data.gameid != id) return {result: false};
         return {result: true, data: data};
     });
     return res;
