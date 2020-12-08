@@ -5,6 +5,10 @@ const token = require('../token-middleware/token');
 const db_fetch = require('../../fetch-wrapper/main');
 
 router.get('/:gameid', async (req, res) => {
+    if(req.params.gameid == 'undefined') {
+        token.setToken('');
+        res.redirect('/');
+    };
     try {
         var checkAuthToken = token.checkAuth(req, req.params.gameid, process.env.JWT_SECRET);
         if(checkAuthToken.result == true) {
