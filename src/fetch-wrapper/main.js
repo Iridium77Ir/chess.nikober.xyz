@@ -1,12 +1,19 @@
 //Load .env file
 require('dotenv').config();
 
-const fetch = require('node-fetch');
+//Get DB
+var Chess = require('../frontend/models/chess');
 
-async function createGame(data) {
+async function createGame() {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/newGame', { method: 'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify(data)});
-        return res.json();
+        var newGame = new Chess({});
+        if(req.body.color == 'b') {
+            newGame.blackAssigned = true;
+        } else {
+            newGame.whiteAssigned = true;
+        }
+        var game = await newGame.save();
+        return {game: game};
     } catch (err) {
         return {err: err};
     }
@@ -14,13 +21,12 @@ async function createGame(data) {
 
 async function getGame(id) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/getGame', { method: 'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
-        res = res.json();
-        if(res.error == undefined) {
-            return {game: res.game};
+        var game = await Chess.findById(id);
+        if(game != '' && game != null) {
+            return {game: game};
         } else {
-            return {error: res};
-        }
+            return {error: 'gamenotfound'};
+        };
     } catch (err) {
         return {err: err};  
     };
@@ -28,13 +34,16 @@ async function getGame(id) {
 
 async function updateGame(id, fen) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/updateGame', { method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id, fen: fen})});
-        res = res.json();
-        if(res.error == undefined) {
-            return {message: res.message};
+        var game = await Chess.findById(id);
+        if(game != '' && game != null) {
+            game.previousfen = game.fen;
+            game.fen = fen;
+            game.updated = Date.now();
+            await game.save();
+            return {game: game};
         } else {
-            return {error: res};
-        }
+            return {error: 'gamenotfound'};
+        };
     } catch (err) {
         return {err: err};
     };
@@ -42,13 +51,13 @@ async function updateGame(id, fen) {
 
 async function deleteGame(id) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/deleteGame', { method: 'DELETE', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
-        res = res.json();
-        if(res.error == undefined) {
-            return {message: res.message};
+        var game = await Chess.findById(id);
+        if(game != '' && game != null) {
+            await game.remove();
+            return {message: 'success'};
         } else {
-            return {error: res};
-        }
+            return {error: 'gamenotfound'};
+        };
     } catch (err) {
         return {err: err};
     };
@@ -56,13 +65,14 @@ async function deleteGame(id) {
 
 async function takebackGame(id) {
     try {
-        var res = await fetch('http://localhost:' + process.env.DB_PORT + '/game/takebackGame', { method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({gameid: id})});
-        res = res.json();
-        if(res.error == undefined) {
-            return {game: res.game};
+        var game = await Chess.findById(id);
+        if(game != '' && game != null) {
+            game.fen = game.previousfen;
+            await game.save();
+            return {game: game};
         } else {
-            return {error: res};
-        }
+            return {error: 'gamenotfound'};
+        };
     } catch (err) {
         return {err: err};
     };
