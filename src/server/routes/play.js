@@ -96,10 +96,10 @@ io.on('connection', function (socket) {
                             socket.broadcast.emit('move', data);
                         };
                     } else {
-                        sendError('Invalid Move.');
+                        sendError(socket, 'Invalid Move.');
                     };
                 };
-                sendError('Wrong player.');
+                sendError(socket, 'Wrong player.');
             };
         } catch (err) {
             sendError(socket, err);
