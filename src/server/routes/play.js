@@ -15,10 +15,10 @@ router.get('/:gameid', async (req, res) => {
             if(checkAuthToken.err == 'nocookies') {
                 var resGame = await db_fetch.getGame(req.params.gameid);
                 if(resGame.game.whiteAssigned == false) {
-                    token.setToken(res, {color: 'w', gameid: req.params.id}, process.env.JWT_SECRET);
+                    token.setToken(res, {color: 'w', gameid: req.params.gameid}, process.env.JWT_SECRET);
                     res.render('play', {gameid: req.params.gameid});
                 } else if(resGame.game.blackAssigned == false) {
-                    token.setToken(res, {color: 'b', gameid: req.params.id}, process.env.JWT_SECRET);
+                    token.setToken(res, {color: 'b', gameid: req.params.gameid}, process.env.JWT_SECRET);
                     res.render('play', {gameid: req.params.gameid});
                 } else {
                     res.render('error', {error: "This game is already full or doesn't exist!"})
@@ -103,7 +103,7 @@ io.on('connection', function (socket) {
                 var game = await db_fetch.deleteGame(data.id);
                 if(!game.hasOwnProperty('err')) {
                     socket.emit('redirect', '/');
-                    socket.broadcast.emit('opponentLeave', '/play');
+                    socket.broadcast.emit('opponentLeave', '/');
                 } else {
                     sendError(socket, 'Could not delete Game.');
                 };
