@@ -51,11 +51,12 @@ function sendError(socket, err) {
 }
 
 function authenticate(token, id) {
-    jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
+    var res = jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
         if (err) return {result: false};
         if (data.id != id) return {result: false};
         return {result: true, data: data};
     });
+    return res;
 }
 
 io.on('connection', function (socket) {
