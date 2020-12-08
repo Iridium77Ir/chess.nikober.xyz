@@ -92,9 +92,9 @@ socket.on('play', function (data) {
 socket.on('move', function (data) {
     game.move(data.move)
     board.position(data.fen);
-    if(game.turn() == color) {
+    if(game.turn() == 'b' && color == 'w') {
         setButton(false);
-    } else if(game.turn() == color) {
+    } else if(game.turn() == 'w' && color == 'b') {
         setButton(false);
     } else {
         setButton(true);
