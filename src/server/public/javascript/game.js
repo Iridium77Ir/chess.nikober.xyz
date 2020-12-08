@@ -180,7 +180,6 @@ var onSnapEnd = function () {
 socket.on('fen', (data) => {
     play = false;
     socket.emit('play', {token: token, id: roomId});
-    document.getElementById('gameStatus').innerText = "Game in Progress";
     setButton(false);
     document.getElementById('gameStatus').innerText = "Waiting for Second player";
     var cfg = {

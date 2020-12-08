@@ -60,7 +60,7 @@ io.on('connection', function (socket) {
                 var game = await db_fetch.getGame(data.id);
                 if(!game.hasOwnProperty('err')) {
                     socket.join(game.game.id);
-                    socket.broadcast.emit('fen', {fen: game.game.fen});
+                    socket.emit('fen', {fen: game.game.fen});
                 };
             };
         } catch (err) {
