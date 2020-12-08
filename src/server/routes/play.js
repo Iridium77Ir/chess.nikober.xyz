@@ -87,11 +87,7 @@ io.on('connection', function (socket) {
         try {
             if(authenticate(data.token, data.id) == false) {
                 socket.emit('error', {error: 'tokenerror'});
-            } else {
-                if(!game.hasOwnProperty('err')) {                
-                    socket.emit('redirect', '/');
-                    socket.broadcast.emit('opponentLeave', '/play');
-                };
+            } else {           
                 socket.broadcast.emit('play', data);
             };
         } catch (err) {
