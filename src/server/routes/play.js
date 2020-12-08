@@ -98,8 +98,9 @@ io.on('connection', function (socket) {
                     } else {
                         sendError(socket, 'Invalid Move.');
                     };
+                } else {
+                    sendError(socket, 'Wrong player.');
                 };
-                sendError(socket, 'Wrong player.');
             };
         } catch (err) {
             sendError(socket, err);
