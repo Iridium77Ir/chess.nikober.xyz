@@ -58,9 +58,9 @@ io.on('connection', function (socket) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 var game = await db_fetch.getGame(data.id);
-                if(game.err == undefined) {
-                    socket.join(game.id);
-                    socket.broadcast.emit('fen', {fen: game.fen});
+                if(!game.hasOwnProperty('err')) {
+                    socket.join(game.game.id);
+                    socket.broadcast.emit('fen', {fen: game.game.fen});
                 };
             };
         } catch (err) {
@@ -74,7 +74,7 @@ io.on('connection', function (socket) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 var game = await db_fetch.updateGame(data.id, data.fen);
-                if(game.err == undefined) {
+                if(!game.hasOwnProperty('err')) {
                     socket.broadcast.emit('move', data);
                 };
             };
@@ -88,7 +88,7 @@ io.on('connection', function (socket) {
             if(authenticate(data.token, data.id) == false) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
-                if(game.err == undefined) {                
+                if(!game.hasOwnProperty('err')) {                
                     socket.emit('redirect', '/');
                     socket.broadcast.emit('opponentLeave', '/play');
                 };
@@ -105,7 +105,7 @@ io.on('connection', function (socket) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 var game = await db_fetch.deleteGame(data.id);
-                if(game.err == undefined) {
+                if(!game.hasOwnProperty('err')) {
                     socket.emit('redirect', '/');
                     socket.broadcast.emit('opponentLeave', '/play');
                 } else {
@@ -135,7 +135,7 @@ io.on('connection', function (socket) {
                 socket.emit('error', {error: 'tokenerror'});
             } else {
                 var game = await db_fetch.takebackGame(data.id);
-                if(game.err == undefined) {
+                if(!game.hasOwnProperty('err')) {
                     socket.emit('takebackResetBoard', game.game.previousfen);
                     socket.broadcast.emit('takebackResetBoard', game.game.previousfen); 
                 } else {
