@@ -49,6 +49,25 @@ async function updateGame(id, fen) {
     };
 };
 
+async function updatePlayers(id, color) {
+    try {
+        var game = await Chess.findById(id);
+        if(game != '' && game != null) {
+            if(color == 'w') {
+                game.whiteAssigned = true;
+            } else if(color == 'b') {
+                game.blackAssigned = true;
+            };
+            await game.save();
+            return {game: game};
+        } else {
+            return {error: 'gamenotfound'};
+        };
+    } catch (err) {
+        return {err: err};
+    };
+}
+
 async function deleteGame(id) {
     try {
         var game = await Chess.findById(id);
@@ -78,4 +97,4 @@ async function takebackGame(id) {
     };
 };
 
-module.exports = {createGame: createGame, getGame: getGame, updateGame: updateGame, deleteGame: deleteGame, takebackGame: takebackGame};
+module.exports = {createGame: createGame, getGame: getGame, updateGame: updateGame, deleteGame: deleteGame, takebackGame: takebackGame, updatePlayers: updatePlayers};

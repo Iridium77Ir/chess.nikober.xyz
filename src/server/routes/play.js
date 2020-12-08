@@ -20,13 +20,11 @@ router.get('/:gameid', async (req, res) => {
             if(checkAuthToken.err == 'nocookies') {
                 var resGame = await db_fetch.getGame(req.params.gameid);
                 if(resGame.game.whiteAssigned == false) {
-                    resGame.whiteAssigned = true;
-                    await resGame.save();
+                    db_fetch.updatePlayers(req.params.gameid, 'w');
                     token.setToken(res, {color: 'w', gameid: req.params.gameid}, process.env.JWT_SECRET);
                     res.render('play', {gameid: req.params.gameid});
                 } else if(resGame.game.blackAssigned == false) {
-                    resGame.blackAssigned = true;
-                    await resGame.save();
+                    db_fetch.updatePlayers(req.params.gameid, 'b');
                     token.setToken(res, {color: 'b', gameid: req.params.gameid}, process.env.JWT_SECRET);
                     res.render('play', {gameid: req.params.gameid});
                 } else {
