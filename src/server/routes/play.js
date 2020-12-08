@@ -8,6 +8,7 @@ router.get('/:gameid', async (req, res) => {
     if(req.params.gameid == 'undefined') {
         token.setToken('');
         res.redirect('/');
+        return;
     };
     try {
         var checkAuthToken = token.checkAuth(req, req.params.gameid, process.env.JWT_SECRET);
