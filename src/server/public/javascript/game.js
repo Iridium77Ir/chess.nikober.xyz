@@ -46,7 +46,7 @@ function offerTakeback() {
 //Socket Handlers:
 //Handling errors
 socket.on('errorMessage', (data) => {
-    alert('Err: ' + data.error);
+    alert('Err: ' + data.error.error);
     eraseCookie('chess-token');
 })
 //What happens when an opponent leaves
@@ -127,8 +127,8 @@ var onDragStart = function (source, piece) {
     if (game.game_over() === true || play ||
         (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
         (game.turn() === 'b' && piece.search(/^w/) !== -1) ||
-        (game.turn() === 'w' && color === 'black') ||
-        (game.turn() === 'b' && color === 'white') ) {
+        (game.turn() === 'w' && color === 'b') ||
+        (game.turn() === 'b' && color === 'w') ) {
             return false;
     }
 };
