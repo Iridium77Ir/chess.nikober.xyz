@@ -2,7 +2,7 @@
 var socket = io('wss://' + window.location.hostname + ':443');
 
 //Get jwt
-var token = JSON.parse(getCookie('chess-token'));
+var token = parseJwt(getCookie('chess-token'));
 
 //Initing the chess.js board
 var game = new Chess();
