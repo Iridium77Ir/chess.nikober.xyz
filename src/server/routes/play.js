@@ -45,7 +45,7 @@ const io = require('socket.io')(process.env.WEBSOCKET_PORT);
 const chess = require('chess.js');
 
 //Parse cookies
-const cookie = require('cookies');
+const cookie = require('cookie');
 
 //function to send the Error to both players
 function sendError(socket, err) {
@@ -54,7 +54,7 @@ function sendError(socket, err) {
 }
 
 function authenticate(token, id) {
-    token = token.replace('%22', '');
+    token = token['chess-token'].replace('"', '');
     var res = jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
         if (err) return {result: false};
         if (data.id != id) return {result: false};
