@@ -3,7 +3,7 @@ require('dotenv').config();
 
 //The socket.io part:
 //Import socket.io and create a server at the port specified in the .env file
-const io = require('socket.io')(process.env.WEBSOCKET_PORT);
+const io = require('socket.io')(process.env.WEBSOCKET_PORT, {cors: {origin: '*'}});
 
 const db_fetch = require('../fetch-wrapper/main.js');
 const jwt = require('jsonwebtoken');
