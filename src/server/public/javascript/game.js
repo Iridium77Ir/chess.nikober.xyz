@@ -183,7 +183,7 @@ socket.on('fen', (data) => {
     setButton(false);
     document.getElementById('gameStatus').innerText = "Waiting for Second player";
     var cfg = {
-        orientation: color,
+        orientation: ((color == 'w') ? ('white') : ('black')),
         draggable: true,
         position: 'start',
         onDragStart: onDragStart,
