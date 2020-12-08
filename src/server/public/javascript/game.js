@@ -109,6 +109,7 @@ socket.on('redirect', (data) => {
 //Send the joined confirmation to receive information about onself
 roomId = document.getElementById('roomId').innerText;
 socket.emit('joined', {token: token, id: roomId});
+setButton(true);
 
 function setButton(state) {
     document.getElementById('takebackButton').disabled = state;
