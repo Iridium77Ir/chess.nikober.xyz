@@ -3,6 +3,7 @@ var socket = io('wss://' + window.location.hostname + ':443');
 
 //Get jwt
 var token = parseJwt(getCookie('chess-token'));
+var rawToken = getCookie('chess-token');
 
 //Initing the chess.js board
 var game = new Chess();
@@ -17,7 +18,7 @@ var hasPressed = false;
 //Functions
 //Leave match
 function leaveMatch() {
-    socket.emit('gameOver', {token: token, id: roomId});
+    socket.emit('gameOver', {token: rawToken, id: roomId});
     eraseCookie('chess-token');
 };
 //Create the grey squares that appear when hovering over tiles
@@ -37,7 +38,7 @@ var removeGreySquares = function () {
 function offerTakeback() {
     if(!hasPressed) {
         setButton(true);
-        socket.emit('offerTakeback', {token: token, id: roomId});
+        socket.emit('offerTakeback', {token: rawToken, id: roomId});
         hasPressed = true;
         setButton(true);
     };
@@ -60,14 +61,14 @@ socket.on('takebackOffered', (data) => {
     alert('Your opponent offered a takeback!');
     var acceptButton = document.createElement('button');
     acceptButton.onclick = function() {
-        socket.emit('takebackAccept', {token: token, id: roomId})
+        socket.emit('takebackAccept', {token: rawToken, id: roomId})
         declineButton.remove();
         acceptButton.remove();
     };
     acceptButton.innerText = 'Accept Takeback.'
     var declineButton = document.createElement('button');
     declineButton.onclick = function() {
-        socket.emit('takebackReject', {token: token, id: roomId});
+        socket.emit('takebackReject', {token: rawToken, id: roomId});
         declineButton.remove();
         acceptButton.remove();
     };
@@ -114,7 +115,7 @@ socket.on('redirect', (data) => {
 })
 //Send the joined confirmation to receive information about onself
 roomId = document.getElementById('roomId').innerText;
-socket.emit('joined', {token: token, id: roomId});
+socket.emit('joined', {token: rawToken, id: roomId});
 
 function setButton(state) {
     document.getElementById('takebackButton').disabled = state;
@@ -155,7 +156,7 @@ var onDrop = function (source, target) {
     // illegal move
     if (move === null) return 'snapback';
     else
-        socket.emit('move', {token: token, move: move, fen: game.fen(), id: roomId });
+        socket.emit('move', {token: rawToken, move: move, fen: game.fen(), id: roomId });
      
     if(game.turn() == 'b' && color == 'w' && !hasPressed) {
         setButton(false);
@@ -191,7 +192,7 @@ var onSnapEnd = function () {
 //initialising the board:
 socket.on('fen', (data) => {
     play = false;
-    socket.emit('play', {token: token, id: roomId});
+    socket.emit('play', {token: rawToken, id: roomId});
     setButton(false);
     document.getElementById('gameStatus').innerText = "Waiting for Second player";
     var cfg = {
