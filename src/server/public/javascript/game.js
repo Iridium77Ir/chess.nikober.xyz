@@ -46,7 +46,7 @@ function offerTakeback() {
 //Socket Handlers:
 //Handling errors
 socket.on('errorMessage', (data) => {
-    alert('Err: ' + data.error.error);
+    alert('Err: ' + data.error);
     eraseCookie('chess-token');
 })
 //What happens when an opponent leaves

@@ -51,6 +51,7 @@ function sendError(socket, err) {
 }
 
 function authenticate(token, id) {
+    token = JSON.parse(token);
     var res = jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
         if (err) return {result: false};
         if (data.id != id) return {result: false};
