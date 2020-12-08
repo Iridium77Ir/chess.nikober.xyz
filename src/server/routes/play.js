@@ -90,16 +90,16 @@ io.on('connection', function (socket) {
             } else {
                 var game = await db_fetch.getGame(data.id);
                 if((authData.data.color == 'w' && new chess.Chess(data.fen).turn() == 'b') || (authData.data.color == 'b' && new chess.Chess(data.fen).turn() == 'w')) {
-                    if(new chess.Chess(game.game.previousfen).move(data.move) !== null) {
+                    if(new chess.Chess(game.game.fen).move(data.move) !== null) {
                         var game = await db_fetch.updateGame(data.id, data.fen);
                         if(!game.hasOwnProperty('err')) {
                             socket.broadcast.emit('move', data);
                         };
                     } else {
-                        sendError(socket, 'Invalid Move.');
+                        socket.emit('illegalMove', {fen: game.game.fen});
                     };
                 } else {
-                    sendError(socket, 'Wrong player.');
+                    socket.emit('illegalMove', '');
                 };
             };
         } catch (err) {

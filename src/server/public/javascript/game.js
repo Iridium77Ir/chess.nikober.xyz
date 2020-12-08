@@ -109,6 +109,9 @@ socket.on('move', function (data) {
     };
     hasPressed = false;
 });
+socket.on('illegalMove', function (data) {
+    board.position(data.fen);
+});
 //redirect
 socket.on('redirect', (data) => {
     window.location.replace(data);
