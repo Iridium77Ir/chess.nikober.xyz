@@ -6,7 +6,7 @@ const db_fetch = require('../../fetch-wrapper/main');
 
 router.get('/:gameid', async (req, res) => {
     if(req.params.gameid == 'undefined') {
-        token.setToken('');
+        res.clearCookie('chess-token');
         res.redirect('/');
         return;
     };
@@ -20,12 +20,17 @@ router.get('/:gameid', async (req, res) => {
             if(checkAuthToken.err == 'nocookies') {
                 var resGame = await db_fetch.getGame(req.params.gameid);
                 if(resGame.game.whiteAssigned == false) {
+                    resGame.whiteAssigned = true;
+                    await resGame.save();
                     token.setToken(res, {color: 'w', gameid: req.params.gameid}, process.env.JWT_SECRET);
                     res.render('play', {gameid: req.params.gameid});
                 } else if(resGame.game.blackAssigned == false) {
+                    resGame.blackAssigned = true;
+                    await resGame.save();
                     token.setToken(res, {color: 'b', gameid: req.params.gameid}, process.env.JWT_SECRET);
                     res.render('play', {gameid: req.params.gameid});
                 } else {
+                    res.clearCookie('chess-token');
                     res.render('error', {error: "This game is already full or doesn't exist!"})
                 };
             } else {
@@ -69,7 +74,7 @@ io.on('connection', function (socket) {
         try {
             var authData = authenticate(cookie.parse(socket.handshake.headers.cookie), data.id);
             if(authData.result == false) {
-                socket.emit('error', {error: 'tokenerror'});
+                socket.emit('redirect', '/');
             } else {
                 var game = await db_fetch.getGame(data.id);
                 if(!game.hasOwnProperty('err')) {
