@@ -109,7 +109,6 @@ socket.on('redirect', (data) => {
 //Send the joined confirmation to receive information about onself
 roomId = document.getElementById('roomId').innerText;
 socket.emit('joined', {token: token, id: roomId});
-setButton(true);
 
 function setButton(state) {
     document.getElementById('takebackButton').disabled = state;
@@ -152,9 +151,9 @@ var onDrop = function (source, target) {
     else
         socket.emit('move', {token: token, move: move, fen: game.fen(), id: roomId });
      
-    if(game.turn() == 'b' && color == 'w') {
+    if(game.turn() == 'b' && color == 'w' && hasPressed) {
         setButton(false);
-    } else if(game.turn() == 'w' && color == 'b') {
+    } else if(game.turn() == 'w' && color == 'b' && hasPressed) {
         setButton(false);
     } else {
         setButton(true);
@@ -203,6 +202,7 @@ socket.on('fen', (data) => {
     board = ChessBoard('board', cfg);
     board.position(data.fen);
     game = new Chess(data.fen);
+    setButton(true);
 });
 
 //Board variable
