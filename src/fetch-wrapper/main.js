@@ -4,10 +4,10 @@ require('dotenv').config();
 //Get DB
 var Chess = require('../frontend/models/chess');
 
-async function createGame() {
+async function createGame(data) {
     try {
         var newGame = new Chess({});
-        if(req.body.color == 'b') {
+        if(data.color == 'b') {
             newGame.blackAssigned = true;
         } else {
             newGame.whiteAssigned = true;
